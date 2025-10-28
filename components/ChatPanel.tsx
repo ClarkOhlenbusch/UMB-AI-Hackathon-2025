@@ -1,9 +1,13 @@
-
 import React, { useState, useRef, useEffect } from 'react';
-import { ChatMessage, AnalysisResult } from '../types';
-import { BotIcon, SendIcon, UserIcon } from './Icons';
-import { AnalysisPanel } from './AnalysisPanel';
+import { ChatMessage } from '../types';
+import { BotIcon, SendIcon, UserIcon, PaperclipIcon } from './Icons';
 
+// Declare mammoth for TypeScript since it's loaded from a script tag
+declare global {
+    interface Window {
+        mammoth: any;
+    }
+}
 
 interface ChatPanelProps {
   messages: ChatMessage[];
@@ -15,6 +19,7 @@ interface ChatPanelProps {
 export const ChatPanel: React.FC<ChatPanelProps> = ({ messages, onSubmit, isLoading, hasAnalysis }) => {
   const [input, setInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -40,6 +45,33 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ messages, onSubmit, isLoad
       handleSubmit(e);
     }
   };
+
+  const handleFileSelect = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.type !== 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+        alert('Please upload a valid .docx file.');
+        if (e.target) e.target.value = ''; // Reset file input
+        return;
+    }
+
+    try {
+        const arrayBuffer = await file.arrayBuffer();
+        const result = await window.mammoth.extractRawText({ arrayBuffer });
+        setInput(prev => prev ? `${prev}\n\n${result.value}` : result.value); // Append or set text
+    } catch (error) {
+        console.error('Error processing .docx file:', error);
+        alert('There was an error reading the .docx file.');
+    } finally {
+        if (e.target) e.target.value = ''; // Reset file input
+    }
+  };
+
 
   return (
     <div className="flex flex-col h-full bg-white dark:bg-gray-800 shadow-lg rounded-lg">
@@ -76,15 +108,33 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ messages, onSubmit, isLoad
             value={input}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
-            placeholder={hasAnalysis ? "Ask a follow-up question..." : "Paste patient transcript here..."}
-            className="w-full p-3 pr-12 text-gray-700 bg-gray-100 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:placeholder-gray-400"
+            placeholder={hasAnalysis ? "Ask a follow-up question..." : "Paste transcript or upload a .docx file..."}
+            className="w-full p-3 pl-12 pr-12 text-gray-700 bg-gray-100 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:placeholder-gray-400"
             rows={3}
             disabled={isLoading}
           />
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            className="hidden"
+            aria-hidden="true"
+          />
+           <button
+            type="button"
+            onClick={handleFileSelect}
+            disabled={isLoading}
+            className="absolute bottom-3 left-3 p-2 text-gray-500 rounded-full disabled:text-gray-400 disabled:cursor-not-allowed hover:text-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
+            aria-label="Attach transcript file"
+          >
+            <PaperclipIcon className="w-5 h-5" />
+          </button>
           <button
             type="submit"
             disabled={isLoading || !input.trim()}
             className="absolute bottom-3 right-3 p-2 text-white bg-blue-500 rounded-full disabled:bg-gray-400 disabled:cursor-not-allowed hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
+            aria-label="Send message"
           >
             <SendIcon className="w-5 h-5" />
           </button>
