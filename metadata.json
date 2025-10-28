@@ -1,0 +1,5 @@
+{
+  "name": "AI Distress Analysis Tool",
+  "description": "An AI-powered tool to analyze patient transcripts for emotional distress, providing a detailed breakdown of sentiment, evidence, and supportive recommendations.",
+  "requestFramePermissions": []
+}
