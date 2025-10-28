@@ -1,8 +1,7 @@
-
 import React from 'react';
 import { AnalysisResult, EvidenceSpan } from '../types';
-// FIX: Import BotIcon to resolve 'Cannot find name' error.
 import { WarningIcon, BotIcon } from './Icons';
+import { PDFExportButton } from '../PDFExport';
 
 interface AnalysisPanelProps {
   analysisResult: AnalysisResult | null;
@@ -60,6 +59,7 @@ const DistressLevelBadge: React.FC<{ level: AnalysisResult['distress_level'] }> 
 };
 
 export const AnalysisPanel: React.FC<AnalysisPanelProps> = ({ analysisResult }) => {
+  
   if (!analysisResult) {
     return (
       <div className="flex flex-col items-center justify-center h-full p-6 bg-white rounded-lg dark:bg-gray-800 shadow-lg">
@@ -76,7 +76,10 @@ export const AnalysisPanel: React.FC<AnalysisPanelProps> = ({ analysisResult }) 
 
   return (
     <div className="p-6 bg-white rounded-lg dark:bg-gray-800 shadow-lg h-full overflow-y-auto">
-      <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-4">Distress Analysis</h2>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-100">Distress Analysis</h2>
+        <PDFExportButton analysisResult={analysisResult} fileName="distress-analysis-report.pdf" />
+      </div>
       
       {safety_flag && (
         <div className="flex items-center p-4 mb-4 text-red-800 bg-red-100 border-l-4 border-red-500 rounded-md dark:bg-red-900 dark:text-red-200">

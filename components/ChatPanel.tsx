@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ChatMessage } from '../types';
-import { BotIcon, SendIcon, UserIcon, PaperclipIcon } from './Icons';
+import { BotIcon, SendIcon, UserIcon, PaperclipIcon, PlusCircleIcon } from './Icons';
 
 // Declare mammoth for TypeScript since it's loaded from a script tag
 declare global {
@@ -14,9 +14,10 @@ interface ChatPanelProps {
   onSubmit: (message: string) => void;
   isLoading: boolean;
   hasAnalysis: boolean;
+  onStartNewAnalysis: () => void;
 }
 
-export const ChatPanel: React.FC<ChatPanelProps> = ({ messages, onSubmit, isLoading, hasAnalysis }) => {
+export const ChatPanel: React.FC<ChatPanelProps> = ({ messages, onSubmit, isLoading, hasAnalysis, onStartNewAnalysis }) => {
   const [input, setInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -103,6 +104,18 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ messages, onSubmit, isLoad
       </div>
 
       <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+        {hasAnalysis && !isLoading && (
+            <div className="mb-3 text-center">
+                <button
+                    type="button"
+                    onClick={onStartNewAnalysis}
+                    className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-green-600 border border-transparent rounded-md shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 dark:focus:ring-offset-gray-800"
+                >
+                    <PlusCircleIcon className="w-5 h-5" />
+                    Start New Analysis
+                </button>
+            </div>
+        )}
         <form onSubmit={handleSubmit} className="relative">
           <textarea
             value={input}

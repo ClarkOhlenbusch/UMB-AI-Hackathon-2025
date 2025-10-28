@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Chat } from '@google/genai';
 import { AnalysisResult, ChatMessage } from './types';
@@ -13,15 +12,25 @@ function App() {
   const [error, setError] = useState<string | null>(null);
   const chatRef = useRef<Chat | null>(null);
 
+  const initialMessage: ChatMessage = {
+    sender: 'bot',
+    text: "Welcome to the AI Distress Analysis Tool. Please paste a patient transcript to begin."
+  };
+
   useEffect(() => {
-    // Add initial welcome message from bot
-    setMessages([
-        {
-            sender: 'bot',
-            text: "Welcome to the AI Distress Analysis Tool. Please paste a patient transcript to begin."
-        }
-    ]);
+    setMessages([initialMessage]);
   }, []);
+
+  const handleStartNewAnalysis = () => {
+    setAnalysisResult(null);
+    chatRef.current = null;
+    setError(null);
+    setIsLoading(false);
+    setMessages([{ 
+        sender: 'bot', 
+        text: "Ready for a new analysis. Please provide the next transcript." 
+    }]);
+  };
 
   const handleSubmit = async (inputText: string) => {
     setIsLoading(true);
@@ -67,7 +76,13 @@ function App() {
         </header>
         <main className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-8 min-h-0">
             <div className="min-h-0">
-                <ChatPanel messages={messages} onSubmit={handleSubmit} isLoading={isLoading} hasAnalysis={!!analysisResult} />
+                <ChatPanel 
+                    messages={messages} 
+                    onSubmit={handleSubmit} 
+                    isLoading={isLoading} 
+                    hasAnalysis={!!analysisResult} 
+                    onStartNewAnalysis={handleStartNewAnalysis} 
+                />
             </div>
             <div className="min-h-0">
                 <AnalysisPanel analysisResult={analysisResult} />
