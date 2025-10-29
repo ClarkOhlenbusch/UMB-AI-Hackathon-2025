@@ -72,7 +72,7 @@ function App() {
     <div className="w-full h-screen p-4 md:p-8 flex flex-col text-gray-900 dark:text-gray-100">
         <header className="text-center mb-6">
             <h1 className="text-4xl font-bold text-gray-800 dark:text-gray-100">AI Distress Analysis Tool</h1>
-            <p className="text-lg text-gray-600 dark:text-gray-400">Leveraging Gemini to understand patient sentiment</p>
+            <p className="text-lg text-gray-600 dark:text-gray-400">Leveraging AI to understand patient sentiment</p>
         </header>
         <main className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-8 min-h-0">
             <div className="min-h-0">
